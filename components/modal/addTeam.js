@@ -28,6 +28,15 @@ const AddTeamModal = ({ isOpen, onClose, onProfileAdded }) => {
     setStackImages(Array.from(e.target.files));
   };
 
+  const resetForm = () => {
+    // Reset form fields
+    setName('');
+    setTitle('');
+    setDescription('');
+    setProfileImage(null);
+    setStackImages([]);
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -54,6 +63,7 @@ const AddTeamModal = ({ isOpen, onClose, onProfileAdded }) => {
       
       console.log("Upload response:", response.data);
       onProfileAdded(response.data.data);
+      resetForm();
       onClose();
     } catch (error) {
       console.error("Upload error:", error);  

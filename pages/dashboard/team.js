@@ -18,12 +18,11 @@ const Team = () => {
     const fetchTeamProfiles = async () => {
       const token = localStorage.getItem('token');
       try {
-        
         const response = await axios.get("/api/team", {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
-        }); 
+        });
         console.log("Fetched team profiles:", response.data);
         setTeamProfiles(response.data);
       } catch (error) {
@@ -53,13 +52,29 @@ const Team = () => {
     setIsEditOpen(true);
   };
 
-  const handleUpdate = (updatedProfile) => {
-    setTeamProfiles((prevProfiles) =>
-      prevProfiles.map((profile) =>
-        profile._id === updatedProfile._id ? updatedProfile : profile
-      )
-    );
-    setIsEditOpen(false);
+  const handleUpdate = async (updatedProfile) => {
+    const token  = localStorage.getItem('token')
+    try {
+      // Fetch the updated profile data from the server
+      const response = await axios.get(`/api/team/${updatedProfile._id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      const freshProfile = response.data;
+  
+      // Update the teamProfiles state with the latest data
+      setTeamProfiles((prevProfiles) =>
+        prevProfiles.map((profile) =>
+          profile._id === freshProfile._id ? freshProfile : profile
+        )
+      );
+  
+      setIsEditOpen(false);
+    } catch (error) {
+      console.error('Error fetching the updated profile:', error);
+    }
   };
 
   const openDeleteModal = (profileId) => {
@@ -85,7 +100,7 @@ const Team = () => {
             Add Member
           </button>
         </div>
-        <AddTeamModal isOpen={isModalOpen} onClose={closeModal} onProfileAdded={handleProfileCreated}/>
+        <AddTeamModal isOpen={isModalOpen} onClose={closeModal} onProfileAdded={handleProfileCreated} />
         {isEditOpen && (
           <EditTeamModal
             profile={editingProfile}
@@ -94,13 +109,13 @@ const Team = () => {
             onEditClose={() => setIsEditOpen(false)}
           />
         )}
-          <DeleteMember
-            isDeleteOpen={isDeleteOpen}
-            onDeleteClose={closeDeleteModal}
-            profileId={selectedProfileId}
-            onDeleteSuccess={handleDeleteSuccess}
-          />
-        
+        <DeleteMember
+          isDeleteOpen={isDeleteOpen}
+          onDeleteClose={closeDeleteModal}
+          profileId={selectedProfileId}
+          onDeleteSuccess={handleDeleteSuccess}
+        />
+
         <div>
           <div className="container py-4 mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -145,7 +160,7 @@ const Team = () => {
                         >
                           Edit
                         </button>
-                        
+
                         <button
                           key={profile._id}
                           className=" p-1 w-16 text-gray-800 bg-orange-200 border-0 focus:outline-none hover:bg-orange-400 rounded"
@@ -153,7 +168,7 @@ const Team = () => {
                         >
                           Delete
                         </button>
-                        
+
                       </div>
                     </div>
                   </div>
