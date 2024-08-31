@@ -29,7 +29,6 @@ const AddTeamModal = ({ isOpen, onClose, onProfileAdded }) => {
   };
 
   const resetForm = () => {
-    // Reset form fields
     setName('');
     setTitle('');
     setDescription('');

@@ -55,7 +55,6 @@ const Team = () => {
   const handleUpdate = async (updatedProfile) => {
     const token  = localStorage.getItem('token')
     try {
-      // Fetch the updated profile data from the server
       const response = await axios.get(`/api/team/${updatedProfile._id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -63,8 +62,6 @@ const Team = () => {
       });
   
       const freshProfile = response.data;
-  
-      // Update the teamProfiles state with the latest data
       setTeamProfiles((prevProfiles) =>
         prevProfiles.map((profile) =>
           profile._id === freshProfile._id ? freshProfile : profile

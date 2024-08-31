@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 
 function App({ Component, pageProps }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isModalOpen, setModalOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
