@@ -17,6 +17,7 @@ const editTeamModal = ({ isEditOpen, onEditClose, onUpdate, profile }) => {
   const [name, setName] = useState(profile?.name || '');
   const [profileImage, setProfileImage] = useState(null);
   const [title, setTitle] = useState(profile?.title || '');
+  const [detail, setDetail] = useState(profile?.detail || '');
   const [description, setDescription] = useState(profile?.description || '');
   const [stackImages, setStackImages] = useState(profile?.stackImages || []);
   const [errorMessage, setErrorMessage] = useState('');
@@ -25,6 +26,7 @@ const editTeamModal = ({ isEditOpen, onEditClose, onUpdate, profile }) => {
     if (profile) {
       setName(profile.name);
       setTitle(profile.title);
+      setDetail(profile.detail);
       setDescription(profile.description);
       setStackImages(profile.stackImages || []);
     }
@@ -46,6 +48,7 @@ const editTeamModal = ({ isEditOpen, onEditClose, onUpdate, profile }) => {
     const formData = new FormData()
     formData.append('name', name)
     formData.append('title', title)
+    formData.append('detail', detail)
     formData.append('description', description)
     if (profileImage) {
       formData.append('Images', profileImage)
@@ -142,6 +145,18 @@ const editTeamModal = ({ isEditOpen, onEditClose, onUpdate, profile }) => {
                     className="mt-1 block w-full text-gray-900 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     required
                   />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Profile Detail
+                  </label>
+                  <textarea
+                    value={detail}
+                    onChange={(e) => setDetail(e.target.value)}
+                    className="mt-1 block w-full text-gray-900 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    rows="3"
+                    required
+                  ></textarea>
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700">

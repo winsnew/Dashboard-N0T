@@ -4,8 +4,6 @@ import { useState } from "react";
 import Head from "next/head";
 
 const Main = ({ children }) => {
-  //   const {...rest} = props
-//   const { user } = useAuth({ middleware: "auth" });
   const [open, setOpen] = useState(true);
   return (
     <>

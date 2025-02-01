@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import AddPorto from "../../components/modal/addPorto";
 import EditPorto from "../../components/modal/editPorto";
 import DeletePorto from "../../components/modal/deletePorto";
@@ -11,24 +12,55 @@ const Portfolio = () => {
   const [selectedPortoId, setSelectedPortoId] = useState(null);
   const [portoTeams, setPortoTeams] = useState([])
   const [editingPorto, setEditingPorto] = useState(null)
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
   const openModal = () => setModalOpen(true)
   const closeModal = () => setModalOpen(false)
   useEffect(() => {
-    const fetchPortoTeam = async () => {
-      const token = localStorage.getItem("token")
+    const checkLoginStatus = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/login");
+        return;
+      }
+
+      try {
+        const res = await axios.post("/api/auth/verify-token", { token }, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (res.data.success) {
+          setIsLoggedIn(true);
+          fetchPortoTeam(token); 
+        } else {
+          router.push("/login");
+        }
+      } catch (error) {
+        console.error("Token verification failed:", error);
+        router.push("/login");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const fetchPortoTeam = async (token) => {
       try {
         const response = await axios.get("/api/porto", {
           headers: {
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`
           },
-        })
-        setPortoTeams(response.data)
+        });
+        setPortoTeams(response.data);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-    }
-    fetchPortoTeam()
-  }, [])
+    };
+
+    checkLoginStatus();
+  }, [router])
 
   const handlePortoCreated = (newPorto) => {
     setPortoTeams((prevPorto) => [...prevPorto, newPorto])
@@ -75,6 +107,18 @@ const Portfolio = () => {
   const handleDeleteSuccess = (portoId) => {
     setPortoTeams(prevPorto => prevPorto.filter(porto => porto._id !== portoId));
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        <h2>Please log in to view your portfolio.</h2>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full mt-5">

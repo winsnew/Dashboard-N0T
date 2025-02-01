@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../lib/axios";
+import { useRouter } from "next/router";
 import AddTeamModal from "../../components/modal/addTeam";
 import EditTeamModal from "../../components/modal/editTeam";
 import DeleteMember from "../../components/modal/deleteMember";
@@ -11,10 +12,41 @@ const Team = () => {
   const [selectedProfileId, setSelectedProfileId] = useState(null);
   const [teamProfiles, setTeamProfiles] = useState([]);
   const [editingProfile, setEditingProfile] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);
 
   useEffect(() => {
+    const checkLoginStatus = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/login");
+        return;
+      }
+
+      try {
+        const res = await axios.post("/api/auth/verify-token", { token }, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (res.data.success) {
+          setIsLoggedIn(true);
+          fetchTeamProfiles(token);
+        } else {
+          router.push("/login");
+        }
+      } catch (error) {
+        console.error("Token verification failed:", error);
+        router.push("/login");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     const fetchTeamProfiles = async () => {
       const token = localStorage.getItem('token');
       try {
@@ -23,15 +55,14 @@ const Team = () => {
             'Authorization': `Bearer ${token}`,
           },
         });
-        console.log("Fetched team profiles:", response.data);
         setTeamProfiles(response.data);
       } catch (error) {
         console.error("Error fetching team profiles:", error);
       }
     };
 
-    fetchTeamProfiles();
-  }, []);
+    checkLoginStatus();
+  }, [router]);
 
   const handleProfileCreated = (newProfile) => {
     setTeamProfiles((prevProfiles) => [...prevProfiles, newProfile]);
@@ -88,6 +119,18 @@ const Team = () => {
     setTeamProfiles(prevProfiles => prevProfiles.filter(profile => profile._id !== profileId));
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        <h2>Please log in to view your team.</h2>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="w-full mt-5 mb-12">
@@ -135,6 +178,9 @@ const Team = () => {
                     <h1 className="text-gray-900 text-xl title-font font-medium mb-1">
                       {profile.title}
                     </h1>
+                    <p className="leading-relaxed text-sm">
+                      {profile.detail}
+                    </p>
                     <p className="leading-relaxed text-sm">
                       {profile.description}
                     </p>

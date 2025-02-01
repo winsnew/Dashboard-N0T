@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 function App({ Component, pageProps }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -25,25 +26,30 @@ function App({ Component, pageProps }) {
               router.push('/dashboard/main');
             }
           } else {
-            setIsLoggedIn(false);
-            localStorage.removeItem("token");
-            if (router.pathname.startsWith("/dashboard/main")) {
-              router.push("/login");
-            }
+            handleLogout();
           }
         } catch (error) {
-          console.log("Token verification failed:", error);
-          setIsLoggedIn(false);
-          localStorage.removeItem("token");
-          if (router.pathname.startsWith("/dashboard/main")) {
-            router.push("/login");
-          }
+          console.error("Token verification failed:", error);
+          handleLogout();
         }
       } else {
-        setIsLoggedIn(false);
-        if (router.pathname.startsWith("/dashboard/main")) {
-          router.push("/login");
-        }
+        handleLogout();
+      }
+      setIsLoading(false);
+    };
+
+    const handleLogout = () => {
+      setIsLoggedIn(false);
+      localStorage.removeItem("token");
+
+      const protectedRoutes = [
+        "/dashboard/main",
+        "/dashboard/team",
+        "/dashboard/portfolio"
+      ];
+
+      if (protectedRoutes.some(route => router.pathname.startsWith(route))) {
+        router.push("/login");
       }
     };
 
@@ -60,7 +66,7 @@ function App({ Component, pageProps }) {
       );
     } else {
       return (
-        <Layout>
+        <Layout isLoggedIn={isLoggedIn} isLoading={isLoading}>
           <Component {...pageProps} />
         </Layout>
       );

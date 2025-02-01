@@ -16,6 +16,7 @@ const backdropVariants = {
 const AddTeamModal = ({ isOpen, onClose, onProfileAdded }) => {
   const [name, setName] = useState('');
   const [title, setTitle] = useState('');
+  const [detail, setDetail] = useState('');
   const [description, setDescription] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [stackImages, setStackImages] = useState([]);
@@ -31,6 +32,7 @@ const AddTeamModal = ({ isOpen, onClose, onProfileAdded }) => {
   const resetForm = () => {
     setName('');
     setTitle('');
+    setDetail('');
     setDescription('');
     setProfileImage(null);
     setStackImages([]);
@@ -44,6 +46,7 @@ const AddTeamModal = ({ isOpen, onClose, onProfileAdded }) => {
     const formData = new FormData();
     formData.append('name', name);
     formData.append('title', title);
+    formData.append('detail', detail);
     formData.append('description', description);
     if (profileImage) {
       formData.append('Images', profileImage);
@@ -127,6 +130,18 @@ const AddTeamModal = ({ isOpen, onClose, onProfileAdded }) => {
                     className="mt-1 block w-full text-gray-900 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     required
                   />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Profile Detail
+                  </label>
+                  <textarea
+                    value={detail}
+                    onChange={(e) => setDetail(e.target.value)}
+                    className="mt-1 block w-full text-gray-900 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    rows="3"
+                    required
+                  ></textarea>
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700">
